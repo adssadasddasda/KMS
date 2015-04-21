@@ -1,14 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-typedef struct _cell *cells;
-typedef struct _cell {
+typedef struct _cells *cells;
+typedef struct _cells {
   int contents;
-  struct cells* rchild;
-  struct cells* dchild;
+  struct cell* rchild;
+  struct cell* dchild;
 } cell;
-
-//#define NILCell ((cells)0)
 
 cells grid_init(int num_columns, int num_rows) {
   cells new = malloc(sizeof(cell));
@@ -48,23 +47,41 @@ void grid_print(cells grid) {
   }
 }
 
+void grid_print_dot(cells grid) {
+  
+}
+
+// Fills the specified cell with the content.
 void grid_fillCell(int column, int row, int content, cells grid) {
   int i;
   cells here = grid;
-  for (i=1; i<column; i++) {
+  for (i=0; i<column; i++) {
     here = here->rchild;
   }
-  for (i=1; i<row; i++) {
+  for (i=0; i<row; i++) {
     here = here->dchild;
   }
   here->contents = content;
 }
 
+// Fills the Grid with random Numbers in the range between min and max.
+void grid_fillrandom(cells grid, int min, int max) {
+  cells column = grid;
+  cells row;
+  srand(time(NULL));
+  while (column!=NULL) {
+    row = column;
+    while (row!=NULL) {
+      row->contents = rand()%(max+1-min)+min;
+      row = row->dchild;
+    }
+    column = column->rchild;
+  }
+}
+
 int main() {
-  cells h = grid_init(3, 4);
-  grid_fillCell(2, 3, 5, h);
-  grid_fillCell(1, 1, 3, h);
-  grid_fillCell(3, 4, 9, h);
-  grid_print(h);
+  cells h = grid_init(4, 5); //(columns, rows)
+  grid_fillrandom(h, 1, 2); //(grid, minimum, maximum)
+  grid_print(h); //(grid)
   return 0;
 }
