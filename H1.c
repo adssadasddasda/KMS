@@ -53,15 +53,15 @@ void grid_print_dot(cells grid) {
 
 // Fills the specified cell with the content.
 void grid_fillCell(int column, int row, int content, cells grid) {
-  int i;
-  cells here = grid;
-  for (i=0; i<column; i++) {
-    here = here->rchild;
+  if (column=0&row=0) {
+    grid->contents = content;
   }
-  for (i=0; i<row; i++) {
-    here = here->dchild;
+  if (column>0) {
+    grid_fillCell(column-1, row, content, grid->rchild);
   }
-  here->contents = content;
+  if (row>0) {
+    grid_fillCell(column, row-1, content, grid->dchild);
+  }
 }
 
 // Fills the Grid with random Numbers in the range between min and max.
