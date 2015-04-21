@@ -53,31 +53,31 @@ void grid_print(cell grid) {
 
 //The surrounding construct for the DOT Language.
 void grid_print_dot(cell grid) {
-    FILE* file = fopen("H1.txt", "w");
-    fprintf(file, "digraph {\n");
-    grid_print_dot_cells(file, grid);
-    fprintf(file, "}");
-    fclose(file);
+  FILE* file = fopen("H1.txt", "w");
+  fprintf(file, "digraph {\n");
+  grid_print_dot_cells(file, grid);
+  fprintf(file, "}");
+  fclose(file);
 }
 
 //Recursive writing the Adresses of the childs to the file.
 void grid_print_dot_cells(FILE* file, cell grid) {
-    if (grid!=NULL) {
-      if (grid->dchild!=NULL) fprintf(file, "  M0x%p -> M0x%p\n", grid, grid->dchild);
-      if (grid->rchild!=NULL) fprintf(file, "  M0x%p -> M0x%p\n", grid, grid->rchild);
-      grid_print_dot_cells(file, grid->dchild);
-      grid_print_dot_cells(file, grid->rchild);
-    }
+  if (grid!=NULL) {
+    if (grid->dchild!=NULL) fprintf(file, "  M0x%p -> M0x%p\n", grid, grid->dchild);
+    if (grid->rchild!=NULL) fprintf(file, "  M0x%p -> M0x%p\n", grid, grid->rchild);
+    grid_print_dot_cells(file, grid->dchild);
+    grid_print_dot_cells(file, grid->rchild);
+  }
 }
 
 // Fills the specified cell with the content.
 void grid_fillCell(int column, int row, int content, cell grid) {
-    if (grid!=NULL){
-      if (column>0) grid_fillCell(column-1, row, content, grid->rchild);
-      else if (row>0) grid_fillCell(column, row-1, content, grid->dchild);
-      else grid->contents = content;
-    }
-    else printf("Target Cell is outside the Grid!\n");
+  if (grid!=NULL){
+    if (column>0) grid_fillCell(column-1, row, content, grid->rchild);
+    else if (row>0) grid_fillCell(column, row-1, content, grid->dchild);
+    else grid->contents = content;
+  }
+  else printf("Target Cell is outside the Grid!\n");
 }
 
 // Fills the Grid with random Numbers in the range between min and max.
