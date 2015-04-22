@@ -60,7 +60,7 @@ void grid_print_dot_cells(FILE* file, cell grid) {
   }
 }
 
-//The surrounding construct for the DOT language.
+//Creating, opening and finally closing the H1.exe and writing the surrounding construct for the DOT language.
 void grid_print_dot(cell grid) {
   FILE* file = fopen("H1.txt", "w");
   fprintf(file, "digraph {\n");
