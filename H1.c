@@ -59,7 +59,7 @@ void grid_recursive_print_row(cell grid, int row) {
 }
 
 //Recursive solution for the print method. The problem is that every cell must be visited
-//(SUM(i=0 to [number of row] i) times [number of columns) times additional to the loop ([number of rows] times) in this method.
+//(SUM(i=0 to [number of rows]) i) * [number of columns]) times additional to the loop ([number of rows] times) in this method.
 void grid_recursive_print(cell grid) {
   int row = 0;
   cell here;
