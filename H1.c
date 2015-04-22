@@ -30,10 +30,9 @@ cell grid_init(int num_columns, int num_rows) {
 void grid_print(cell grid) {
   int columns = 1;
   int i;
-  cell here = grid;
-  while (here->rchild!=NULL) {
+  cell here;
+  for (here=grid; here->rchild!=NULL; here=here->rchild) {
     columns++;
-    here = here->rchild;
   }
   cell row[columns];
   here = grid;
