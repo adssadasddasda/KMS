@@ -94,11 +94,10 @@ void grid_fill_random(cell grid, int min, int max) {
   }
 
 int main() {
-  cell h = grid_init(4, 5); //(columns, rows)
-  printf("M0x%p\n", h);
-  grid_fill_random(h, 1, 2); //(grid, minimum, maximum)
-  grid_fillCell(3, 2, 0, h);
-  grid_print(h); //(grid)
-  grid_print_dot(h);
+  cell h = grid_init(10, 5); //(columns, rows) initialize the grid
+  grid_fill_random(h, 100, 199); //(grid, minimum, maximum) fill random numbers into the cells
+  grid_fillCell(6, 2, 666, h); //(column, row, content, grid) replace the content of one specific cell
+  grid_print(h); //(grid) print the grid into the terminal
+  grid_print_dot(h); //(grid) create H1.txt and write the DOT language code of the structure in there
   return 0;
 }
