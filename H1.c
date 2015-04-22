@@ -25,7 +25,8 @@ cell grid_init(int num_columns, int num_rows) {
   return new;
 }
 
-//Prints the grid.
+//Prints the grid. This method runs through the loops [number of columns]*2+[number of columns]*[number of rows]
+//times, which is slightly less than the recursive solution i made, but uses an array therefore.
 void grid_print(cell grid) {
   int columns = 1;
   int i;
@@ -47,6 +48,26 @@ void grid_print(cell grid) {
       row[i] = row[i]->dchild;
     }
     printf("|\n");
+  }
+}
+
+//Recursive prints the content of the given row
+void grid_recursive_print_row(cell grid, int row) {
+  if (row==0) printf("%d ", grid->contents);
+  else grid_recursive_print_row(grid->dchild, row-1);
+  if (grid->rchild!=NULL) grid_recursive_print_row(grid->rchild, row);
+}
+
+//Recursive solution for the print method. The problem is that every cell must be visited
+//(SUM(i=0 to [number of row] i) times [number of columns) times additional to the loop ([number of rows] times) in this method.
+void grid_recursive_print(cell grid) {
+  int row = 0;
+  cell here;
+  for (here=grid; here!=NULL; here=here->dchild) {
+    printf("| ");
+    grid_recursive_print_row(grid, row);
+    printf("|\n");
+    row++;
   }
 }
 
@@ -97,6 +118,9 @@ int main() {
   cell h = grid_init(10, 5); //(columns, rows) initialize the grid
   grid_fill_random(h, 100, 199); //(grid, minimum, maximum) fill random numbers into the cells
   grid_fillCell(6, 2, 666, h); //(column, row, content, grid) replace the content of one specific cell
+  printf("Recursive print method:\n");
+  grid_recursive_print(h); //(grid) print the grid into the terminal
+  printf("Non-recursive print method;\n");
   grid_print(h); //(grid) print the grid into the terminal
   grid_print_dot(h); //(grid) create H1.txt and write the DOT language code of the structure in there
   return 0;
