@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-//The typedef struckt of cells
+//The typedef struct of cell.
 typedef struct _cell *cell;
 typedef struct _cell {
   int contents;
@@ -10,7 +10,7 @@ typedef struct _cell {
   cell dchild;
 } single_cell;
 
-//Initialises a grid with set columns and rows.
+//Initializes a grid with set columns and rows.
 cell grid_init(int num_columns, int num_rows) {
   cell new = malloc(sizeof(single_cell));
   new->contents = 0;
@@ -50,17 +50,7 @@ void grid_print(cell grid) {
   }
 }
 
-
-//The surrounding construct for the DOT Language.
-void grid_print_dot(cell grid) {
-  FILE* file = fopen("H1.txt", "w");
-  fprintf(file, "digraph {\n");
-  grid_print_dot_cells(file, grid);
-  fprintf(file, "}");
-  fclose(file);
-}
-
-//Recursive writing the Adresses of the childs to the file.
+//Recursive writing the addresses of the children to the file.
 void grid_print_dot_cells(FILE* file, cell grid) {
   if (grid!=NULL) {
     if (grid->dchild!=NULL) fprintf(file, "  M0x%p -> M0x%p\n", grid, grid->dchild);
@@ -70,35 +60,43 @@ void grid_print_dot_cells(FILE* file, cell grid) {
   }
 }
 
-// Fills the specified cell with the content.
+//The surrounding construct for the DOT language.
+void grid_print_dot(cell grid) {
+  FILE* file = fopen("H1.txt", "w");
+  fprintf(file, "digraph {\n");
+  grid_print_dot_cells(file, grid);
+  fprintf(file, "}");
+  fclose(file);
+}
+
+
+//Fills the specified cell with the content.
 void grid_fillCell(int column, int row, int content, cell grid) {
   if (grid!=NULL){
     if (column>0) grid_fillCell(column-1, row, content, grid->rchild);
     else if (row>0) grid_fillCell(column, row-1, content, grid->dchild);
     else grid->contents = content;
   }
-  else printf("Target Cell is outside the Grid!\n");
+  else printf("Target cell is outside of the grid!\n");
 }
 
-// Fills the Grid with random Numbers in the range between min and max.
-void grid_fillrandom(cell grid, int min, int max) {
-  cell column = grid;
-  cell row;
-  srand(time(NULL));
-  while (column!=NULL) {
-    row = column;
-    while (row!=NULL) {
-      row->contents = rand()%(max+1-min)+min;
-      row = row->dchild;
-    }
-    column = column->rchild;
-  }
+//Recursive runs through the grid and sets the content of every cell to a random number in the range of min to max.
+void grid_fill_cell_random(cell grid, int min, int max) {
+  grid->contents = rand()%(max+1-min)+min;
+  if (grid->rchild!=NULL) grid_fill_cell_random(grid->rchild, min, max);
+  if (grid->dchild!=NULL) grid_fill_cell_random(grid->dchild, min, max);
 }
+
+//This is necessary because frequent usage of srand(time(NULL)) resets the seed of rand and results in not so random integers.
+void grid_fill_random(cell grid, int min, int max) {
+  srand(time(NULL));
+  grid_fill_cell_random(grid, min, max);
+  }
 
 int main() {
   cell h = grid_init(4, 5); //(columns, rows)
   printf("M0x%p\n", h);
-  grid_fillrandom(h, 1, 2); //(grid, minimum, maximum)
+  grid_fill_random(h, 1, 2); //(grid, minimum, maximum)
   grid_fillCell(3, 2, 0, h);
   grid_print(h); //(grid)
   grid_print_dot(h);
