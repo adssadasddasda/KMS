@@ -26,46 +26,21 @@ cell* grid_init(int num_columns, int num_rows) {
   return new;
 }
 
-//Prints the grid. This method runs through the loops [number of columns]*2+[number of columns]*[number of rows]
-//times, which is slightly less than the recursive solution i made, but uses an array therefore.
-void grid_print(cell* grid) {
-  int columns = 1;
-  int i;
-  cell* here;
-  for (here=grid; here->rchild!=NULL; here=here->rchild) {
-    columns++;
-  }
-  cell* row[columns];
-  here = grid;
-  for (i=0; i<columns; i++) {
-    row[i] = here;
-    here = here->rchild;
-  }
-  while (row[0]!=NULL) {
-    printf("| ");
-    for (i=0; i<columns; i++) {
-      printf("%d ", row[i]->contents);
-      row[i] = row[i]->dchild;
-    }
-    printf("|\n");
-  }
-}
-
 //Recursive prints the content of the given row
-void grid_recursive_print_row(cell* grid, int row) {
+void grid_print_row(cell* grid, int row) {
   if (row==0) printf("%d ", grid->contents);
-  else grid_recursive_print_row(grid->dchild, row-1);
-  if (grid->rchild!=NULL) grid_recursive_print_row(grid->rchild, row);
+  else grid_print_row(grid->dchild, row-1);
+  if (grid->rchild!=NULL) grid_print_row(grid->rchild, row);
 }
 
 //Recursive solution for the print method. The problem is that every cell must be visited
 //(SUM(i=0 to [number of rows]) i) * [number of columns]) times additional to the loop ([number of rows] times) in this method.
-void grid_recursive_print(cell* grid) {
+void grid_print(cell* grid) {
   int row = 0;
   cell* here;
   for (here=grid; here!=NULL; here=here->dchild) {
     printf("| ");
-    grid_recursive_print_row(grid, row);
+    grid_print_row(grid, row);
     printf("|\n");
     row++;
   }
@@ -90,7 +65,6 @@ void grid_print_dot(cell* grid) {
   fclose(file);
 }
 
-
 //Fills the specified cell with the content.
 void grid_fillCell(int column, int row, int content, cell* grid) {
   if (grid!=NULL){
@@ -114,6 +88,31 @@ void grid_fill_random(cell* grid, int min, int max) {
   grid_fill_cell_random(grid, min, max);
   }
 
+//Prints the grid. This method runs through the loops [number of columns]*2+[number of columns]*[number of rows]
+//times, which is slightly less than the recursive solution i made, but uses an array therefore.
+void alt_grid_print(cell* grid) {
+  int columns = 1;
+  int i;
+  cell* here;
+  for (here=grid; here->rchild!=NULL; here=here->rchild) {
+    columns++;
+  }
+  cell* row[columns];
+  here = grid;
+  for (i=0; i<columns; i++) {
+    row[i] = here;
+    here = here->rchild;
+  }
+  while (row[0]!=NULL) {
+    printf("| ");
+    for (i=0; i<columns; i++) {
+      printf("%d ", row[i]->contents);
+      row[i] = row[i]->dchild;
+    }
+    printf("|\n");
+  }
+}
+
 //Deletes the cell and all dchilds of that cell.
 void grid_delete_column_cell(cell* column) {
   if (column->dchild!=NULL) grid_delete_column_cell(column->dchild);
@@ -131,16 +130,13 @@ cell* grid_get_column(cell* grid, int column) {
 //Deletes and reliks the desired column. Frees memory.
 cell* grid_delete_column(cell* grid, int column) {
   if (grid!=NULL){
-    if (column==1) {
+    if (column>1) {
       grid->rchild = grid_delete_column(grid->rchild, column-1);
       return grid;
     } else if (column==0) {
       cell* rchild = grid->rchild;
       grid_delete_column_cell(grid);
       return rchild;
-    } else if (column>1) {
-      grid_delete_column(grid->rchild, column-1);
-      return grid;
     } else if (column<0) {
       printf("Column does not exist for grid_delete_column(cell* grid, int column).\n");
       return NULL;
@@ -176,39 +172,37 @@ cell* grid_delete_row_cell(cell* grid, int row) {
 //Deletes a row of the grid, frees memory and relinks cells if necessary.
 cell* grid_delete_row(cell* grid, int row) {
   if (grid!=NULL) {
-    if (grid->dchild!=NULL) {
       if (row==0) {
-	cell* here;
-	cell* next;
-	cell* dchild = grid->dchild;
-	while (here!=NULL && here->rchild!=NULL) {
-	  here->dchild->rchild = here->rchild->dchild;
-	  next = here->rchild;
-	  free(here);
-	  here = next;
-	}
-	free(here);
-	return dchild;
+        if (grid->dchild!=NULL) {
+          cell* here = grid;
+          cell* next;
+          cell* dchild = grid->dchild;
+          while (here!=NULL && here->rchild!=NULL) {
+            here->dchild->rchild = here->rchild->dchild;
+            next = here->rchild;
+            free(here);
+            here = next;
+          }
+          free(here);
+          return dchild;
+        } else {
+          cell* here = grid;
+          while (here!=NULL) {
+            while(here->rchild!=NULL) {
+              here = here->rchild;
+            }
+          }
+        }
       } else if (row>0) {
-	cell* here;
-	for (here=grid; here!=NULL; here=here->rchild) {
-	  grid_delete_row_cell(here, row);
-	}
-	return grid;
+        cell* here;
+        for (here=grid; here!=NULL; here=here->rchild) {
+          grid_delete_row_cell(here, row);
+        }
+        return grid;
       } else {
-	printf("Target row cannot be <0 for grid_delete_row(cell* grid, int row).\n");
-	return NULL;
+        printf("Target row cannot be <0 for grid_delete_row(cell* grid, int row).\n");
+        return NULL;
       }
-    } else {
-      cell* here = grid;
-      while (here!=NULL) {
-	while(here->rchild!=NULL) {
-	  here = here->rchild;
-	}
-	free(here);
-	here = grid;
-      }
-    }
   }
   return NULL;
 }
@@ -224,12 +218,16 @@ int main() {
   grid_fill_random(h, 100, 199); //(grid, minimum, maximum) fill random numbers into the cells
   grid_fillCell(6, 2, 666, h); //(column, row, content, grid) replace the content of one specific cell
   printf("Recursive print method:\n");
-  grid_recursive_print(h); //(grid) print the grid into the terminal
+  grid_print(h); //(grid) print the grid into the terminal
+  grid_print_dot(h); //(grid) create H1.txt and write the DOT language code of the structure in there
+
+  //Some extra stuff
   h = grid_delete_column(h, 0);
   h = grid_delete_row(h, 0);
   printf("Non-recursive print method;\n");
-  grid_print(h); //(grid) print the grid into the terminal
-  grid_print_dot(h); //(grid) create H1.txt and write the DOT language code of the structure in there
+  alt_grid_print(h); //(grid) print the grid into the terminal
+
+  //Necessary since C does not have a garbage collector like for example Java has.
   grid_delete(h);
   return 0;
 }
